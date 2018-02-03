@@ -1,0 +1,54 @@
+---
+title: "Crime Data Visualisation"
+author: "Anupam kumar Singh, MD"
+date: "10 January 2018"
+output: html_document
+---
+
+
+```{r}
+library(tidyverse)
+library(sp)
+library(RColorBrewer)
+```
+
+```{r}
+crime = m19
+# Hex color codes for NDA orange and UPA green
+party_colors <- c("orange","green") 
+
+z = median(crime$crime_rate,na.rm = TRUE)
+crime %>% filter(year=="2009",crime_reported>50) %>% # select year 2009 and greater than 50 cases to avoid low_base states
+  mutate(income_status = factor(income_status,levels=c("High","Mid","Low"))) %>% # reorder for preserving states in order
+  ggplot(aes(x=crime_rate,y=reorder(states,crime_rate),color=party)) +  
+  geom_vline(xintercept = z, color = "gray30") +
+    geom_point(size = 2)+
+  scale_color_manual(values = party_colors)+
+  facet_wrap(~ income_status,ncol=1,scales="free_y")+
+  guides(color=FALSE) + labs(x = "Crime rate against SC per Lakh of Population in 2009 ", y = "") +
+    theme(axis.text=element_text(size=8))
+
+```
+
+
+
+```{r}
+p0 <- ggplot(data = subset(election, st %nin% "DC"),
+             mapping = aes(x = r_points,
+                           y = reorder(state, r_points),
+                           color = party))
+
+p1 <- p0 + geom_vline(xintercept = 0, color = "gray30") +
+    geom_point(size = 2)
+
+p2 <- p1 + scale_color_manual(values = party_colors)
+
+p3 <- p2 + scale_x_continuous(breaks = c(-30, -20, -10, 0, 10, 20, 30, 40),
+                              labels = c("30\n (Clinton)", "20", "10", "0",
+                                         "10", "20", "30", "40\n(Trump)"))
+
+p3 + facet_wrap(~ census, ncol=1, scales="free_y") +
+    guides(color=FALSE) + labs(x = "Point Margin", y = "") +
+    theme(axis.text=element_text(size=8))
+```
+

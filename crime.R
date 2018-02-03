@@ -197,4 +197,8 @@ cumsum(as.integer(as.character(m9$V2)))
     random4 <- plm(crime_reported~sc_percent+SC_population+murder_rate+ party, data=m21, index=c("states", "year"), model="random")
     summary(random4)
    
+    
+    # writing data
+    write.csv(m19,"crime.csv")
+    
   cor.test(m21$murder_rate,m21$crime_rate)
