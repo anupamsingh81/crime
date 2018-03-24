@@ -2,7 +2,9 @@
 
 library(plm)
 
->     
+# crime reported is crime against SC/per lakh
+
+
 >     fixed <- plm(crime_reported~ SC_population+party, data=m21, index=c("states", "year"), model="within")
 >     random <- plm(crime_reported~ SC_population+party, data=m21, index=c("states", "year"), model="random")
 >     pool <- plm(crime_reported~ SC_population+party, data=m21, index=c("states", "year"), model="pooling") # regular ols(linear regression,all pooled)
