@@ -1,0 +1,65 @@
+# panel data
+
+library(plm)
+
+>     
+>     fixed <- plm(crime_reported~ SC_population+party, data=m21, index=c("states", "year"), model="within")
+>     random <- plm(crime_reported~ SC_population+party, data=m21, index=c("states", "year"), model="random")
+>     pool <- plm(crime_reported~ SC_population+party, data=m21, index=c("states", "year"), model="pooling") # regular ols(linear regression,all pooled)
+> phtest(fixed,random)
+
+	Hausman Test
+
+data:  crime_reported ~ SC_population + party
+chisq = 0.9928, df = 1, p-value = 0.3191
+alternative hypothesis: one model is inconsistent
+
+> # Breusch-Pagan Lagrange Multiplier for random effects. Null is no panel effect (i.e. OLS better).
+>     plmtest(pool, type=c("bp"))
+
+	Lagrange Multiplier Test - (Breusch-Pagan) for unbalanced panels
+
+data:  crime_reported ~ SC_population + party
+chisq = 373, df = 1, p-value < 0.00000000000000022
+alternative hypothesis: significant effects
+
+> # Thus here simple pooling shouldnt work, we do partial pooling..
+>     
+>     summary(random)
+Oneway (individual) effect Random Effect Model 
+   (Swamy-Arora's transformation)
+
+Call:
+plm(formula = crime_reported ~ SC_population + party, data = m21, 
+    model = "random", index = c("states", "year"))
+
+Unbalanced Panel: n = 19, T = 3-8, N = 147
+
+Effects:
+                    var   std.dev share
+idiosyncratic  333453.1     577.5 0.122
+individual    2397883.4    1548.5 0.878
+theta:
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.7895  0.8693  0.8693  0.8677  0.8693  0.8693 
+
+Residuals:
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-1469.26  -201.64   -58.34     0.62    99.78  2815.73 
+
+ # Here we see party upa effect inconsistent. crime 17 incr with incr 1 lakh of sc popln, p-value <0.05, upa/NDA no effect
+   
+
+Coefficients:
+              Estimate Std. Error t-value   Pr(>|t|)    
+(Intercept)    86.0027   539.3748  0.1594     0.8735    
+SC_population  17.4347     3.8708  4.5041 0.00001367 ***
+partyu         85.0112   143.2541  0.5934     0.5538    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Total Sum of Squares:    54520000
+Residual Sum of Squares: 47882000
+R-Squared:      0.12176
+Adj. R-Squared: 0.10956
+F-statistic: 9.98184 on 2 and 144 DF, p-value: 0.00008715
